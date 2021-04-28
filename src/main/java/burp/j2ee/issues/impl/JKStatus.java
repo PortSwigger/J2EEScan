@@ -2,6 +2,7 @@ package burp.j2ee.issues.impl;
 
 import burp.j2ee.CustomScanIssue;
 import burp.CustomHttpRequestResponse;
+import static burp.HTTPMatcher.URIMutator;
 import static burp.HTTPMatcher.getMatches;
 import burp.IBurpExtenderCallbacks;
 import burp.IExtensionHelpers;
@@ -13,6 +14,7 @@ import burp.IScannerInsertionPoint;
 import burp.WeakPasswordBruteforcer;
 import burp.j2ee.Confidence;
 import burp.j2ee.Risk;
+import burp.j2ee.annotation.RunOnlyOnce;
 import burp.j2ee.issues.IModule;
 
 import java.io.PrintWriter;
@@ -59,7 +61,7 @@ public class JKStatus implements IModule{
     private PrintWriter stderr;
 
     
-    @Override
+    @RunOnlyOnce
     public List<IScanIssue> scan(IBurpExtenderCallbacks callbacks, IHttpRequestResponse baseRequestResponse, IScannerInsertionPoint insertionPoint) {
 
         List<IScanIssue> issues = new ArrayList<>();
@@ -83,7 +85,8 @@ public class JKStatus implements IModule{
             String protocol = url.getProtocol();
             Boolean isSSL = (protocol.equals("https"));
 
-            for (String JK_ENDPOINT : JK_ENDPOINTS) {
+            List<String> JK_ENDPOINTS_MUTATED = URIMutator(JK_ENDPOINTS);
+            for (String JK_ENDPOINT : JK_ENDPOINTS_MUTATED) {
 
                 try {
 
